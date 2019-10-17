@@ -13153,6 +13153,27 @@ div#notebook {
 
 
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Community-Peer-Explorer-Demo">Community Peer Explorer Demo<a class="anchor-link" href="#Community-Peer-Explorer-Demo">&#182;</a></h1><p>This notebook is an interactive demo of the Locus Peer Explorer package. 
+It allows you to find and explore the peers of any MSA in 2015 or 2016.</p>
+<p>The different types of peers that you can explore are :</p>
+<ul>
+<li><strong>Geographic peers</strong>: finds the n closest MSAs. This is usually what is done by our potential users as they look for their neighboors. </li>
+<li><strong>Input peers</strong>: this features allows you to find peers based on the concentration of any FMs. This will return the n MSAs that have the most similar distribution of those FMs compared to your MSA. You can also choose to identify peers based on outcomes.</li>
+<li><strong>Peers based on FMs or outcomes automatically selected</strong>: for all these appoaches, we automatically select a subset of FMs or Outcomes and then find the MSAs that are the most similar to you on this subset of features using a distance metric. <ul>
+<li><em>Top FMs</em>: this feature will return the peers based on the first top n FMs that are the most prevalent in your MSA. You will be able to specify n, the number of FMs you want to base the peer identification on.</li>
+<li><em>Distinguishing FMs</em>: the peers returned here are based on the FMs that are distinguishing in your MSA. It will include the most present FMs but also the least present. FMs are ranked based on how much the concentration in your MSA differs from other MSAs. You then choose how many of those distinguishing features you want to base your analysis on.</li>
+<li><em>Distinguishing outcomes</em>: as before, the peers returned here are based on the outcomes that are distinguishing for that MSA.</li>
+<li><em>Minimum coverage peers</em>: this features selects enough FMs so that a given percentage of the total employment in your MSA is covered. As before, the FMs are selected from the most present to the least present. </li>
+<li><em>Local/Non-local</em>: this selects only the local FMs or non-local FMs (waiting for that definition).</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
 
   
 
@@ -13250,7 +13271,7 @@ div#notebook {
 
     <span class="k">return</span> <span class="n">df_peers</span>
 
-<span class="n">interact</span><span class="p">(</span><span class="n">show_peers</span><span class="p">,</span> <span class="n">df_data</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">df_data</span><span class="p">),</span> 
+<span class="n">interact_manual</span><span class="p">(</span><span class="n">show_peers</span><span class="p">,</span> <span class="n">df_data</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">df_data</span><span class="p">),</span> 
                      <span class="n">df_county_dist</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">df_county_dist</span><span class="p">),</span> 
                      <span class="n">df_msa_def</span><span class="o">=</span> <span class="n">fixed</span><span class="p">(</span><span class="n">df_msa_def</span><span class="p">),</span>
                      <span class="n">msa</span><span class="o">=</span><span class="n">input_msa</span><span class="p">,</span> 
@@ -13316,7 +13337,7 @@ div#notebook {
     <span class="n">peers</span><span class="p">,</span> <span class="n">fms</span> <span class="o">=</span> <span class="n">find</span><span class="o">.</span><span class="n">get_peers_from_input</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">msa</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">n_peers</span><span class="p">,</span> <span class="p">[</span><span class="n">fms</span><span class="p">],</span> <span class="p">[</span><span class="n">outcomes</span><span class="p">])</span>
     <span class="n">vis</span><span class="o">.</span><span class="n">quadrant_viz</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">msa</span><span class="p">,</span> <span class="p">[</span><span class="n">msa</span><span class="p">]</span><span class="o">+</span><span class="n">peers</span><span class="p">,</span> <span class="n">fms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">save_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">fms_peers</span> <span class="o">=</span> <span class="n">interact</span><span class="p">(</span><span class="n">show_fms_peers</span><span class="p">,</span> <span class="n">df_data</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">df_data</span><span class="p">),</span>
+<span class="n">interact_manual</span><span class="p">(</span><span class="n">show_fms_peers</span><span class="p">,</span> <span class="n">df_data</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">df_data</span><span class="p">),</span>
           <span class="n">msa</span><span class="o">=</span><span class="n">input_msa</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="mi">2015</span><span class="p">),</span> <span class="n">n_peers</span><span class="o">=</span><span class="n">input_n_peers</span><span class="p">,</span>
                      <span class="n">fms</span><span class="o">=</span><span class="n">input_fms</span><span class="p">,</span> <span class="n">outcomes</span><span class="o">=</span><span class="n">input_outcomes</span><span class="p">)</span>
 </pre></div>
@@ -13340,6 +13361,18 @@ div#notebook {
       Loading widgets...
     </button>
   </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;function __main__.show_fms_peers(df_data, msa, year, n_peers, fms, outcomes)&gt;</pre>
+</div>
 
 </div>
 
@@ -13368,7 +13401,7 @@ div#notebook {
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span> 
         <span class="n">vis</span><span class="o">.</span><span class="n">quadrant_viz</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">msa</span><span class="p">,</span> <span class="p">[</span><span class="n">msa</span><span class="p">]</span><span class="o">+</span><span class="n">peers</span><span class="p">,</span> <span class="n">fms</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">save_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">interact</span><span class="p">(</span><span class="n">show_disting_peers</span><span class="p">,</span> <span class="n">df_data</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">df_data</span><span class="p">),</span>
+<span class="n">interact_manual</span><span class="p">(</span><span class="n">show_disting_peers</span><span class="p">,</span> <span class="n">df_data</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">df_data</span><span class="p">),</span>
           <span class="n">msa</span><span class="o">=</span><span class="n">input_msa</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="n">input_year</span><span class="p">,</span> <span class="n">n_peers</span><span class="o">=</span><span class="n">input_n_peers</span><span class="p">,</span>
                      <span class="n">n_feat</span><span class="o">=</span><span class="n">input_n_features</span><span class="p">)</span>
 </pre></div>
@@ -13432,7 +13465,7 @@ div#notebook {
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span> 
         <span class="n">vis</span><span class="o">.</span><span class="n">quadrant_viz</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">msa</span><span class="p">,</span> <span class="p">[</span><span class="n">msa</span><span class="p">]</span><span class="o">+</span><span class="n">peers</span><span class="p">,</span> <span class="n">fms</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">save_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">interact</span><span class="p">(</span><span class="n">show_top_fms_peers</span><span class="p">,</span> <span class="n">df_data</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">df_data</span><span class="p">),</span>
+<span class="n">interact_manual</span><span class="p">(</span><span class="n">show_top_fms_peers</span><span class="p">,</span> <span class="n">df_data</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">df_data</span><span class="p">),</span>
           <span class="n">msa</span><span class="o">=</span><span class="n">input_msa</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="n">input_year</span><span class="p">,</span> <span class="n">n_peers</span><span class="o">=</span><span class="n">input_n_peers</span><span class="p">,</span>
                      <span class="n">n_fms</span><span class="o">=</span><span class="n">input_n_features</span><span class="p">)</span>
 </pre></div>
