@@ -47,8 +47,8 @@ input_n_fms = widgets.IntSlider(value=5,min=0,max=30,step=1,description='# of FM
 input_coverage = widgets.IntSlider(value=50,min=0,max=100,step=1,description='% of Empl',orientation='horizontal')
 input_year = widgets.RadioButtons(options=[2015, 2016],description='Year', disabled=False)
 input_msa = widgets.Dropdown(options=all_msas,value=name2code(MSA),description='MSA',layout=Layout(width="80%"))
-input_fms = widgets.SelectMultiple(options=all_fms,description='FM',layout=Layout(width="80%"))
-input_outcomes = widgets.SelectMultiple(options=all_outcomes,description='Outcome',layout=Layout(width="80%"))
+input_fms = widgets.SelectMultiple(options=all_fms,description='FM(s)',layout=Layout(width="80%"))
+input_outcomes = widgets.SelectMultiple(options=all_outcomes,description='Outcome(s)',layout=Layout(width="80%"))
 
 def show_peers(df_data, df_county_dist, df_msa_def, msa, n_peers, year):
     peers, fms = find.get_geographic_peers(
@@ -112,9 +112,7 @@ def show_top_fms_peers(df_data, msa, year, n_peers, n_fms):
 
 def show_coverage_peers(df_data, msa, year, n_peers, coverage):
     coverage = coverage/10
-    print(coverage)
     peers, fms = find.get_emp_threshold_peers(df_data, msa, year, n_peers, coverage)
-    print(fms)
     for i in fms:
         vis.quadrant_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
     df_peers = pd.DataFrame({"Peer MSA Code": [str(x) for x in peers]})
