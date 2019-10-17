@@ -4,4 +4,4 @@ nbinteract
 pandas
 geoviz
 locuspeerexplorer
-matplotlib=2.3.3
+matplotlib=2.2.3
