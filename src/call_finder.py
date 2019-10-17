@@ -1,4 +1,5 @@
 from ipywidgets import interactive, interact, fixed, interact_manual, Layout
+import ipywidgets as widgets
 import sys
 import locuspeerexplorer.peer_finder as find
 import locuspeerexplorer.peer_explorer as exp
@@ -8,13 +9,13 @@ import os
 import geoviz.choropleth as choro
 
 df_data = pd.read_csv(
-    "/Users/efloch/Locus/peer-explorer/data/processed/metrics_outcomes.csv"
+    "data/processed/metrics_outcomes.csv"
 )
 df_msa_def = pd.read_csv(
-    "/Users/efloch/Locus/peer-explorer/data/external/omb_msa_1990_2018.csv"
+    "data/external/omb_msa_1990_2018.csv"
 )
 df_county_dist = pd.read_csv(
-    "/Users/efloch/Locus/peer-explorer/data/processed/sf12010countydistance500miles.csv"
+    "data/external/sf12010countydistance500miles.csv"
 )
 
 
