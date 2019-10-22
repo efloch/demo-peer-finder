@@ -102,7 +102,7 @@ def show_fms_peers(df_data, msa, year, n_peers, fms, outcomes):
         outcomes = list(outcomes)
     peers, fms = find.get_peers_from_input(df_data, msa, year, n_peers, fms, outcomes)
     print("Peers identified:")
-    for i in [str(x) for x in peers]:
+    for i in [code2name(x) for x in peers]:
         print(i)
     for i in fms:
         vis.quadrant_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
@@ -117,7 +117,7 @@ def show_disting_peers(df_data, msa, year, n_peers, n_feat):
     )
     print(f"Comparison of {msa} and its peers for the 5 most distinguishing FMs")
     print("Peers identified:")
-    for i in [str(x) for x in peers]:
+    for i in [code2name(x) for x in peers]:
         print(i)
     for i in fms:
         vis.quadrant_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
@@ -130,7 +130,7 @@ def show_top_fms_peers(df_data, msa, year, n_peers, n_fms):
     peers, fms = find.get_top_n_fms_peers(df_data, msa, year, n_peers, n_fms)
     print(f"Comparison of {msa} and its peers for the 5 most present FMs")
     print("Peers identified:")
-    for i in [str(x) for x in peers]:
+    for i in [code2name(x) for x in peers]:
         print(i)
     for i in fms:
         vis.quadrant_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
@@ -143,7 +143,7 @@ def show_coverage_peers(df_data, msa, year, n_peers, coverage):
     coverage = coverage / 10
     peers, fms = find.get_emp_threshold_peers(df_data, msa, year, n_peers, coverage)
     print("Peers identified:")
-    for i in [str(x) for x in peers]:
+    for i in [code2name(x) for x in peers]:
         print(i)
     for i in fms:
         vis.quadrant_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
