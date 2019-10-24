@@ -5,5 +5,5 @@ pandas
 geopandas
 rtree
 geoviz
-locuspeerexplorer==0.2.11
+locuspeerexplorer==0.2.12
 matplotlib==2.2.3
