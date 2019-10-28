@@ -30,9 +30,9 @@ all_fms = {
     for c in df_data.columns
     if "PC_EMPL" in c
 }
-all_fms["None"] = None
+# all_fms["None"] = None
 all_outcomes = {c: c for c in list(df_data.columns)[3:] if ("-" not in c)}
-all_outcomes["None"] = None
+# all_outcomes["None"] = None
 
 MSA = "New York"
 
@@ -92,11 +92,11 @@ def show_peers(df_data, df_county_dist, df_msa_def, msa, n_peers, year):
 
 
 def show_fms_peers(df_data, msa, year, n_peers, fms, outcomes):
-    if fms == "None":
+    if fms == "None" or fms == [None]:
         fms = []
     else:
         fms = list(fms)
-    if outcomes == "None":
+    if outcomes == "None" or outcomes == [None]:
         outcomes = []
     else:
         outcomes = list(outcomes)
