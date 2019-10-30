@@ -27,17 +27,19 @@ def name2code(name):
 
 
 def pretty_prints(peers, fms):
-    print('--------------------')
-    print('| Peers identified |')
-    print('--------------------')
+    print("--------------------")
+    print("| Peers identified |")
+    print("--------------------")
     for i in [code2name(x) for x in peers]:
         print(i)
-    print('-------------------')
-    print('|  Features used  |')
-    print('-------------------')
+    print("-------------------")
+    print("|  Features used  |")
+    print("-------------------")
     for f in fms:
         print(f)
 
+
+pop_limit = 0.2
 
 all_msas = df_msa_def.set_index("CBSA_TITLE").to_dict()["CBSA_CODE"]
 
@@ -137,6 +139,10 @@ input_outcomes = widgets.SelectMultiple(
     options=all_outcomes, description="Outcome(s)", layout=Layout(width="80%")
 )
 
+input_population = widgets.Checkbox(
+    value=False, description="Add population", disabled=False
+)
+
 
 def show_peers(df_data, df_county_dist, df_msa_def, msa, n_peers, year):
     peers, fms = find.get_geographic_peers(
@@ -202,9 +208,13 @@ def show_fms_peers(
     return df_peers
 
 
-def show_disting_peers(df_data, msa, year, n_peers, n_feat):
+def show_disting_peers(df_data, msa, year, n_peers, n_feat, filter_pop):
+    if filter_pop:
+        filter_pop = pop_limit
+    else:
+        filter_pop = None
     peers, fms = find.get_distinguishing_features_peers(
-        df_data, msa, year, n_peers, n_feat
+        df_data, msa, year, n_peers, n_feat, filter_pop
     )
     print(f"Comparison of {msa} and its peers for the {n_feat} most distinguishing FMs")
     pretty_prints(peers, fms)
@@ -216,8 +226,14 @@ def show_disting_peers(df_data, msa, year, n_peers, n_feat):
     return df_peers
 
 
-def show_top_fms_peers(df_data, msa, year, n_peers, n_fms):
-    peers, fms = find.get_top_n_fms_peers(df_data, msa, year, n_peers, n_fms)
+def show_top_fms_peers(df_data, msa, year, n_peers, n_fms, filter_pop):
+    if filter_pop:
+        filter_pop = pop_limit
+    else:
+        filter_pop = None
+    peers, fms = find.get_top_n_fms_peers(
+        df_data, msa, year, n_peers, n_fms, filter_pop
+    )
     print(f"Comparison of {msa} and its peers for the {n_fms} most present FMs")
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, msa, peers, fms)
@@ -228,9 +244,15 @@ def show_top_fms_peers(df_data, msa, year, n_peers, n_fms):
     return df_peers
 
 
-def show_coverage_peers(df_data, msa, year, n_peers, coverage):
+def show_coverage_peers(df_data, msa, year, n_peers, coverage,  filter_pop):
     coverage = coverage / 10
-    peers, fms = find.get_emp_threshold_peers(df_data, msa, year, n_peers, coverage)
+    if filter_pop:
+        filter_pop = pop_limit
+    else:
+        filter_pop = None
+    peers, fms = find.get_emp_threshold_peers(
+        df_data, msa, year, n_peers, coverage, filter_pop
+    )
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, msa, peers, fms)
     for i in fms:
