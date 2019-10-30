@@ -26,6 +26,19 @@ def name2code(name):
     return list(df_name.head(1).CBSA_CODE)[0]
 
 
+def pretty_prints(peers, fms):
+    print('--------------------')
+    print('| Peers identified |')
+    print('--------------------')
+    for i in [code2name(x) for x in peers]:
+        print(i)
+    print('-------------------')
+    print('|  Features used  |')
+    print('-------------------')
+    for f in fms:
+        print(f)
+
+
 all_msas = df_msa_def.set_index("CBSA_TITLE").to_dict()["CBSA_CODE"]
 
 all_fms = {
@@ -175,9 +188,7 @@ def show_fms_peers(
     else:
         outcomes = list(outcomes)
     peers, fms = find.get_peers_from_input(df_data, msa, year, n_peers, fms, outcomes)
-    print("Peers identified:")
-    for i in [code2name(x) for x in peers]:
-        print(i)
+    pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, msa, peers, fms)
     for i in fms:
         vis.duo_fm_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
@@ -191,9 +202,7 @@ def show_disting_peers(df_data, msa, year, n_peers, n_feat):
         df_data, msa, year, n_peers, n_feat
     )
     print(f"Comparison of {msa} and its peers for the {n_feat} most distinguishing FMs")
-    print("Peers identified:")
-    for i in [code2name(x) for x in peers]:
-        print(i)
+    pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, msa, peers, fms)
     for i in fms:
         vis.duo_fm_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
@@ -205,9 +214,7 @@ def show_disting_peers(df_data, msa, year, n_peers, n_feat):
 def show_top_fms_peers(df_data, msa, year, n_peers, n_fms):
     peers, fms = find.get_top_n_fms_peers(df_data, msa, year, n_peers, n_fms)
     print(f"Comparison of {msa} and its peers for the {n_fms} most present FMs")
-    print("Peers identified:")
-    for i in [code2name(x) for x in peers]:
-        print(i)
+    pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, msa, peers, fms)
     for i in fms:
         vis.duo_fm_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
@@ -219,9 +226,7 @@ def show_top_fms_peers(df_data, msa, year, n_peers, n_fms):
 def show_coverage_peers(df_data, msa, year, n_peers, coverage):
     coverage = coverage / 10
     peers, fms = find.get_emp_threshold_peers(df_data, msa, year, n_peers, coverage)
-    print("Peers identified:")
-    for i in [code2name(x) for x in peers]:
-        print(i)
+    pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, msa, peers, fms)
     for i in fms:
         vis.duo_fm_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
