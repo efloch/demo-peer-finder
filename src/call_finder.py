@@ -164,8 +164,8 @@ def show_fms_peers(
     msa,
     year,
     n_peers,
-    fms_agg,
-    fms_biz,
+    fms,
+    # fms_biz,
     #                    fms_cons,
     #                    fms_en,
     #                    fms_fin,
@@ -182,11 +182,16 @@ def show_fms_peers(
     #                    fms_transp,
     outcomes,
 ):
-    fms = list(itertools.chain(fms_agg, fms_biz))
+    # fms = list(itertools.chain(fms_agg, fms_biz))
     if outcomes == "None" or outcomes == [None]:
         outcomes = []
     else:
         outcomes = list(outcomes)
+
+    if fms == "None" or fms == [None]:
+        fms = []
+    else:
+        fms = list(fms)
     peers, fms = find.get_peers_from_input(df_data, msa, year, n_peers, fms, outcomes)
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, msa, peers, fms)
