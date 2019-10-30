@@ -214,7 +214,7 @@ def show_disting_peers(df_data, msa, year, n_peers, n_feat, filter_pop):
     else:
         filter_pop = None
     peers, fms = find.get_distinguishing_features_peers(
-        df_data, msa, year, n_peers, n_feat, filter_pop
+        df_data, msa, year, n_peers, n_feat, filter_pop=filter_pop
     )
     print(f"Comparison of {msa} and its peers for the {n_feat} most distinguishing FMs")
     pretty_prints(peers, fms)
@@ -232,7 +232,7 @@ def show_top_fms_peers(df_data, msa, year, n_peers, n_fms, filter_pop):
     else:
         filter_pop = None
     peers, fms = find.get_top_n_fms_peers(
-        df_data, msa, year, n_peers, n_fms, filter_pop
+        df_data, msa, year, n_peers, n_fms, filter_pop=filter_pop
     )
     print(f"Comparison of {msa} and its peers for the {n_fms} most present FMs")
     pretty_prints(peers, fms)
@@ -251,7 +251,7 @@ def show_coverage_peers(df_data, msa, year, n_peers, coverage,  filter_pop):
     else:
         filter_pop = None
     peers, fms = find.get_emp_threshold_peers(
-        df_data, msa, year, n_peers, coverage, filter_pop
+        df_data, msa, year, n_peers, coverage, filter_pop=filter_pop
     )
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, msa, peers, fms)
