@@ -18,16 +18,18 @@ df_county_dist = pd.read_csv("data/external/sf12010countydistance500miles.csv")
 
 
 def get_data(area):
-    if area.isin(df_msa['AREA']):
+    if area in df_msa['AREA']:
         return df_msa
     else :
         return df_county
 
 def code2name(code):
     code = int(code)
-    if code.isin(df_msa_def['CBSA_CODE']):
+    print(code)
+    print(df_msa_def['CBSA_CODE'])
+    if code in list(df_msa_def['CBSA_CODE']):
         return df_msa_def[df_msa_def["CBSA_CODE"] == code].CBSA_TITLE.iloc[0]
-    else :
+    elif  code in list(df_msa_def['FIPS']):
         return df_msa_def[df_msa_def["FIPS"] == code].COUNTY.iloc[0]
 
 
@@ -70,9 +72,10 @@ all_areas.update(all_counties)
 # }
 
 
+
 all_fms = {" ".join(c.split("_")).capitalize():c for k in param.FM_DICT for c in param.FM_DICT[k]}
 
-all_outcomes = {c: c for c in list(df_data.columns)[3:] if ("-" not in c)}
+all_outcomes = {c: c for c in list(df_msa.columns)[3:] if ("-" not in c)}
 # all_outcomes["None"] = None
 
 style = {"description_width": "initial"}
@@ -97,12 +100,11 @@ input_coverage = widgets.IntSlider(
 input_year = widgets.RadioButtons(
     options=[2015, 2016], description="Year", disabled=False
 )
+
 input_area = widgets.Dropdown(
     options=all_areas,
-    value=name2code(MSA),
     description="Area of interest",
     layout=Layout(width="80%"),
-    style=style
 )
 
 
@@ -119,7 +121,7 @@ input_population = widgets.Checkbox(
 )
 
 
-def show_peers(df_data, df_county_dist, df_msa_def, area, n_peers, year):
+def show_peers(df_county_dist, df_msa_def, area, n_peers, year):
     df_data = get_data(area)
     peers, fms = find.get_geographic_peers(
         df_data, df_county_dist, df_msa_def, area, n_peers, year
@@ -132,7 +134,6 @@ def show_peers(df_data, df_county_dist, df_msa_def, area, n_peers, year):
 
 
 def show_fms_peers(
-    df_data,
     area,
     year,
     n_peers,
@@ -149,6 +150,7 @@ def show_fms_peers(
         fms = []
     else:
         fms = list(fms)
+    df_data = get_data(area)
     peers, fms = find.get_peers_from_input(df_data, area, year, n_peers, fms, outcomes)
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, area, peers, fms, year)
@@ -159,7 +161,7 @@ def show_fms_peers(
     return df_peers
 
 
-def show_disting_peers(df_data, area, year, n_peers, n_feat, filter_pop):
+def show_disting_peers(area, year, n_peers, n_feat, filter_pop):
     if filter_pop:
         filter_pop = pop_limit
     else:
@@ -177,7 +179,8 @@ def show_disting_peers(df_data, area, year, n_peers, n_feat, filter_pop):
     return df_peers
 
 
-def show_top_fms_peers(df_data, area, year, n_peers, n_fms, filter_pop):
+def show_top_fms_peers(area, year, n_peers, n_fms, filter_pop):
+    df_data = get_data(area)
     if filter_pop:
         filter_pop = pop_limit
     else:
@@ -195,7 +198,8 @@ def show_top_fms_peers(df_data, area, year, n_peers, n_fms, filter_pop):
     return df_peers
 
 
-def show_coverage_peers(df_data, area, year, n_peers, coverage,  filter_pop):
+def show_coverage_peers(area, year, n_peers, coverage,  filter_pop):
+    df_data = get_data(area)
     coverage = coverage / 10
     if filter_pop:
         filter_pop = pop_limit
