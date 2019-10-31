@@ -200,9 +200,9 @@ def show_fms_peers(
         fms = list(fms)
     peers, fms = find.get_peers_from_input(df_data, msa, year, n_peers, fms, outcomes)
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, msa, peers, fms)
+    vis.bar_all_fm(df_data, msa, peers, fms, year)
     for i in fms:
-        vis.duo_fm_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
+        vis.duo_fm_viz(df_data, msa, [msa] + peers, i, year, save_fig=False, show=True)
     df_peers = pd.DataFrame({"Peer MSA Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer MSA Code"].apply(code2name)
     return df_peers
@@ -218,9 +218,9 @@ def show_disting_peers(df_data, msa, year, n_peers, n_feat, filter_pop):
     )
     print(f"Comparison of {msa} and its peers for the {n_feat} most distinguishing FMs")
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, msa, peers, fms)
+    vis.bar_all_fm(df_data, msa, peers, fms,year)
     for i in fms:
-        vis.duo_fm_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
+        vis.duo_fm_viz(df_data, msa, [msa] + peers, i, year,save_fig=False, show=True)
     df_peers = pd.DataFrame({"Peer MSA Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer MSA Code"].apply(code2name)
     return df_peers
@@ -236,9 +236,9 @@ def show_top_fms_peers(df_data, msa, year, n_peers, n_fms, filter_pop):
     )
     print(f"Comparison of {msa} and its peers for the {n_fms} most present FMs")
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, msa, peers, fms)
+    vis.bar_all_fm(df_data, msa, peers, fms,year)
     for i in fms:
-        vis.duo_fm_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
+        vis.duo_fm_viz(df_data, msa, [msa] + peers, i,year, save_fig=False, show=True)
     df_peers = pd.DataFrame({"Peer MSA Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer MSA Code"].apply(code2name)
     return df_peers
@@ -254,9 +254,9 @@ def show_coverage_peers(df_data, msa, year, n_peers, coverage,  filter_pop):
         df_data, msa, year, n_peers, coverage, filter_pop=filter_pop
     )
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, msa, peers, fms)
+    vis.bar_all_fm(df_data, msa, peers, fms,year)
     for i in fms:
-        vis.duo_fm_viz(df_data, msa, [msa] + peers, i, save_fig=False, show=True)
+        vis.duo_fm_viz(df_data, msa, [msa] + peers, i, year, save_fig=False, show=True)
     df_peers = pd.DataFrame({"Peer MSA Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer MSA Code"].apply(code2name)
     return df_peers
