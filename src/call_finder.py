@@ -48,7 +48,10 @@ all_fms = {
     for c in df_data.columns
     if "PC_EMPL" in c
 }
-# all_fms["None"] = None
+
+
+all_fms = {" ".join(c.split("_")): c for c in param.FM_DICT[k] for k in param.FM_DICT}
+
 all_outcomes = {c: c for c in list(df_data.columns)[3:] if ("-" not in c)}
 # all_outcomes["None"] = None
 
@@ -103,37 +106,6 @@ input_fms_biz = widgets.SelectMultiple(
     style=style,
 )
 
-# input_fms_cons,
-# # input_fms_en,
-# # input_fms_fin,
-# # input_fms_food,
-# # input_fms_health,
-# # input_fms_infra,
-# # input_fms_manu,
-# # input_fms_media,
-# # input_fms_min,
-# # input_fms_serv,
-# # input_fms_real,
-# # input_fms_retail,
-# # input_fms_tech,
-# # input_fms_transp,
-
-accordion = widgets.Accordion(children=[input_fms_agg, input_fms_biz])
-# input_fms_cons,
-# input_fms_en,
-# input_fms_fin,
-# input_fms_food,
-# input_fms_health,
-# input_fms_infra,
-# input_fms_manu,
-# input_fms_media,
-# input_fms_min,
-# input_fms_serv,
-# input_fms_real,
-# input_fms_retail,
-# input_fms_tech,
-# input_fms_transp])
-accordion.set_title(0, "Business services")
 
 input_outcomes = widgets.SelectMultiple(
     options=all_outcomes, description="Outcome(s)", layout=Layout(width="80%")
@@ -148,20 +120,10 @@ def show_peers(df_data, df_county_dist, df_msa_def, msa, n_peers, year):
     peers, fms = find.get_geographic_peers(
         df_data, df_county_dist, df_msa_def, msa, n_peers, year
     )
-    #     peers.append(msa)
     df_peers = pd.DataFrame({"MSA": [str(x) for x in peers]})
     df_peers["Peer MSA Code"] = df_peers["MSA"].astype(str)
     df_peers["Peer Name"] = df_peers["MSA"].apply(code2name)
     df_peers["Is peer"] = 1
-    #     choro.plot(
-    #         df_peers,
-    #         "MSA",
-    #         "cbsa",
-    #         "Is peer",
-    #         "sequential",
-    #         formatting={"state_outline": "after"},
-    #     )
-
     return df_peers[["Peer Name", "Peer MSA Code"]]
 
 
@@ -171,21 +133,6 @@ def show_fms_peers(
     year,
     n_peers,
     fms,
-    # fms_biz,
-    #                    fms_cons,
-    #                    fms_en,
-    #                    fms_fin,
-    #                    fms_food,
-    #                    fms_health,
-    #                    fms_infra,
-    #                    fms_manu,
-    #                    fms_media,
-    #                    fms_min,
-    #                    fms_serv,
-    #                    fms_real,
-    #                    fms_retail,
-    #                    fms_tech,
-    #                    fms_transp,
     outcomes,
 ):
     # fms = list(itertools.chain(fms_agg, fms_biz))
