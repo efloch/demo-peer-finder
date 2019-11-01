@@ -18,15 +18,15 @@ df_county_dist = pd.read_csv("data/external/sf12010countydistance500miles.csv")
 
 
 def get_data(area):
-    if area in df_msa['AREA']:
+    area = int(area)
+    if area in list(df_msa['AREA']):
         return df_msa
-    else :
+    elif area in list(df_county['AREA']) :
         return df_county
+    
 
 def code2name(code):
     code = int(code)
-    print(code)
-    print(df_msa_def['CBSA_CODE'])
     if code in list(df_msa_def['CBSA_CODE']):
         return df_msa_def[df_msa_def["CBSA_CODE"] == code].CBSA_TITLE.iloc[0]
     elif  code in list(df_msa_def['FIPS']):
@@ -62,6 +62,7 @@ def pretty_prints(peers, fms):
 
 
 all_areas = df_msa_def.set_index("CBSA_TITLE").to_dict()["CBSA_CODE"]
+df_msa_def.sort_values('COUNTY', inplace=True)
 all_counties = df_msa_def.set_index("COUNTY").to_dict()["FIPS"]
 all_areas.update(all_counties)
 
@@ -103,6 +104,7 @@ input_year = widgets.RadioButtons(
 
 input_area = widgets.Dropdown(
     options=all_areas,
+    value=35620,
     description="Area of interest",
     layout=Layout(width="80%"),
 )
@@ -162,10 +164,7 @@ def show_fms_peers(
 
 
 def show_disting_peers(area, year, n_peers, n_feat, filter_pop):
-    if filter_pop:
-        filter_pop = pop_limit
-    else:
-        filter_pop = None
+    df_data = get_data(area)
     peers, fms = find.get_distinguishing_features_peers(
         df_data, area, year, n_peers, n_feat, filter_pop=filter_pop
     )
@@ -181,10 +180,6 @@ def show_disting_peers(area, year, n_peers, n_feat, filter_pop):
 
 def show_top_fms_peers(area, year, n_peers, n_fms, filter_pop):
     df_data = get_data(area)
-    if filter_pop:
-        filter_pop = pop_limit
-    else:
-        filter_pop = None
     peers, fms = find.get_top_n_fms_peers(
         df_data, area, year, n_peers, n_fms, filter_pop=filter_pop
     )
@@ -201,10 +196,6 @@ def show_top_fms_peers(area, year, n_peers, n_fms, filter_pop):
 def show_coverage_peers(area, year, n_peers, coverage,  filter_pop):
     df_data = get_data(area)
     coverage = coverage / 10
-    if filter_pop:
-        filter_pop = pop_limit
-    else:
-        filter_pop = None
     peers, fms = find.get_emp_threshold_peers(
         df_data, area, year, n_peers, coverage, filter_pop=filter_pop
     )
