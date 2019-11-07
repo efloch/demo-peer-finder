@@ -183,31 +183,31 @@ def show_fms_peers(
     return df_peers
 
 
-def show_disting_peers(area, year, n_peers, n_feat, filter_pop):
+def show_disting_peers(area, year, n_peers, n_feat, filter_pop, save_fig):
     df_data = get_data(area)
     peers, fms = find.get_distinguishing_features_peers(
         df_data, area, year, n_peers, n_feat, filter_pop=filter_pop
     )
     print(f"Comparison of {area} and its peers for the {n_feat} most distinguishing FMs")
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, area, peers, fms,year)
+    vis.bar_all_fm(df_data, area, peers, fms,year, save_fig=f"{save_fig}_{area}_all_top.png", show=True)
     for i in fms:
-        vis.duo_fm_viz(df_data, area, [area] + peers, i, year,save_fig=False, show=True)
+        vis.duo_fm_viz(df_data, area, [area] + peers, i, year,save_fig=f"{save_fig}_{area}_top_{i}.png", show=True)
     df_peers = pd.DataFrame({"Peer Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer Code"].apply(code2name)
     return df_peers
 
 
-def show_top_fms_peers(area, year, n_peers, n_fms, filter_pop):
+def show_top_fms_peers(area, year, n_peers, n_fms, filter_pop, save_fig):
     df_data = get_data(area)
     peers, fms = find.get_top_n_fms_peers(
         df_data, area, year, n_peers, n_fms, filter_pop=filter_pop
     )
     print(f"Comparison of {area} and its peers for the {n_fms} most present FMs")
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, area, peers, fms,year)
+    vis.bar_all_fm(df_data, area, peers, fms,year,save_fig=f"{save_fig}_{area}_dist_all.png", show=True)
     for i in fms:
-        vis.duo_fm_viz(df_data, area, [area] + peers, i,year, save_fig=False, show=True)
+        vis.duo_fm_viz(df_data, area, [area] + peers, i,year, save_fig=f"{save_fig}_{area}_dist_{i}.png", show=True)
     df_peers = pd.DataFrame({"Peer Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer Code"].apply(code2name)
     return df_peers
