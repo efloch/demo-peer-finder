@@ -6,6 +6,7 @@ import locuspeerexplorer.peer_explorer as exp
 import locuspeerexplorer.peer_visualizer as vis
 import locuspeerexplorer.params as param
 import pandas as pd
+import us
 import os
 import itertools
 
@@ -27,10 +28,10 @@ def get_data(area):
 
 def code2name(code):
     code = int(code)
-    if code in list(df_msa_def['CBSA_CODE']):
-        return df_msa_def[df_msa_def["CBSA_CODE"] == code].CBSA_TITLE.iloc[0]
-    elif  code in list(df_msa_def['FIPS']):
-        return df_msa_def[df_msa_def["FIPS"] == code].COUNTY.iloc[0]
+    if code in list(df_msa['AREA']):
+        return df_msa[df_msa["AREA"] == code].AREA_NAME.iloc[0]
+    elif code in list(df_county['AREA']) :
+        return df_county[df_county["AREA"] == code].AREA_NAME.iloc[0]
 
 
 def name2code(name):
@@ -62,22 +63,33 @@ def pretty_prints(peers, fms):
             print(f"{fm} ({metric})")
         else:
             print(f)
+            
+STATE_MAPPING = us.states.mapping('fips', 'abbr')
 
+def add_state(x):
+    fips = x.AREA
+    county = x.AREA_NAME
+    state = STATE_MAPPING[str(fips).zfill(5)[:2]]
+    return f"{state}, {county}"
+    
+all_areas = df_msa.set_index("AREA_NAME").to_dict()["AREA"]
+df_county.sort_values('AREA', inplace=True)
 
-all_areas = df_msa_def.set_index("CBSA_TITLE").to_dict()["CBSA_CODE"]
-df_msa_def.sort_values('COUNTY', inplace=True)
-all_counties = df_msa_def.set_index("COUNTY").to_dict()["FIPS"]
+df_county['AREA_NAME'] = df_county.apply(add_state, axis=1)
+all_counties = df_county.set_index("AREA_NAME").to_dict()["AREA"]
+# all_counties = {get_state(k[0], k[1]):k[1] for k in all_counties.items()}
+# all_counties = sorted(all_counties.items, key=operator.itemgetter(1))
 all_areas.update(all_counties)
 
-# all_fms = {
-#     " ".join((c.split("-")[0]).split("_")): c.split("-")[0]
-#     for c in df_data.columns
-#     if "PC_EMPL" in c
-# }
+all_fms = {
+    " ".join((c.split("-")[0]).split("_")): c.split("-")[0]
+    for c in df_msa.columns
+    if "PC_EMPL" in c
+}
 
 
 
-all_fms = {" ".join(c.split("_")).capitalize():c for k in param.FM_DICT for c in param.FM_DICT[k]}
+# all_fms = {" ".join(c.split("_")).capitalize():c for k in param.FM_DICT for c in param.FM_DICT[k]}
 
 all_outcomes = {c: c for c in list(df_msa.columns)[3:] if ("-" not in c)}
 # all_outcomes["None"] = None
@@ -127,9 +139,14 @@ input_population = widgets.Checkbox(
 
 
 def show_peers(df_county_dist, df_msa_def, area, n_peers, year):
-    df_data = get_data(area)
+    if area in list(df_msa['AREA']):
+        df_data = df_msa
+        geo_level='msa'
+    elif area in list(df_county['AREA']) :
+        df_data = df_county
+        geo_level='county'
     peers, fms = find.get_geographic_peers(
-        df_data, df_county_dist, df_msa_def, area, n_peers, year
+        df_data, df_county_dist, df_msa_def, area, n_peers, year, geo_level=geo_level
     )
     df_peers = pd.DataFrame({"Area": [str(x) for x in peers]})
     df_peers["Peer Code"] = df_peers["Area"].astype(str)
