@@ -126,11 +126,11 @@ input_area = widgets.Dropdown(
 
 
 input_fms = widgets.SelectMultiple(
-    options=all_fms, description="FM(s)", layout=Layout(width="80%")
+    options=all_fms, description="FM(s)", layout=Layout(width="80%"), rows=10
 )
 
 input_outcomes = widgets.SelectMultiple(
-    options=all_outcomes, description="Outcome(s)", layout=Layout(width="80%")
+    options=all_outcomes, description="Outcome(s)", layout=Layout(width="80%"), rows=10
 )
 
 input_population = widgets.Checkbox(
