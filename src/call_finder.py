@@ -50,15 +50,18 @@ def pretty_prints(peers, fms):
     print("|  Features used  |")
     print("-------------------")
     for f in fms:
-        fm = f.split('-')[0]
-        fm = fm.replace('_',' ')
-        fm = fm.capitalize()
-        metric = f.split('-')[1]
-        if metric == 'PC_EMPL':
-            metric = 'Concentration'
-        elif metric.startswith('LQ'):
-            metric = 'Location quotient'
-        print(f"{fm} ({metric})")
+        if '-' in f:
+            fm = f.split('-')[0]
+            fm = fm.replace('_',' ')
+            fm = fm.capitalize()
+            metric = f.split('-')[1]
+            if metric == 'PC_EMPL':
+                metric = 'Concentration'
+            elif metric.startswith('LQ'):
+                metric = 'Location quotient'
+            print(f"{fm} ({metric})")
+        else:
+            print(f)
 
 
 all_areas = df_msa_def.set_index("CBSA_TITLE").to_dict()["CBSA_CODE"]
