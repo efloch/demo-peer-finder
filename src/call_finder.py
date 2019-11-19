@@ -111,7 +111,7 @@ input_n_features = widgets.IntSlider(
     orientation="horizontal",
 )
 input_n_fms = widgets.IntSlider(
-    value=5, min=0, max=30, step=1, description="# of FMs", orientation="horizontal"
+    value=5, min=0, max=30, step=1, description="# of Industry", orientation="horizontal"
 )
 input_coverage = widgets.IntSlider(
     value=50, min=0, max=100, step=1, description="% of Empl", orientation="horizontal"
@@ -129,11 +129,11 @@ input_area = widgets.Dropdown(
 
 
 input_fms = widgets.SelectMultiple(
-    options=all_fms, description="FM(s)", layout=Layout(width="80%"), rows=10
+    options=all_fms, description="Industries", layout=Layout(width="80%"), rows=10
 )
 
 input_outcomes = widgets.SelectMultiple(
-    options=all_outcomes, description="Outcome(s)", layout=Layout(width="80%"), rows=10
+    options=all_outcomes, description="Outcomes", layout=Layout(width="80%"), rows=10
 )
 
 input_population = widgets.Checkbox(
@@ -192,7 +192,7 @@ def show_disting_peers(area, year, n_peers, n_feat, filter_pop, save_fig):
     peers, fms = find.get_distinguishing_features_peers(
         df_data, area, year, n_peers, n_feat, filter_pop=filter_pop
     )
-    print(f"Comparison of {area} and its peers for the {n_feat} most distinguishing FMs")
+    print(f"Comparison of {code2name(area)} and its peers for its {n_feat} most distinguishing traits")
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, area, peers, fms, year,
                    save_fig=f"{save_fig}_{area}_all_top.png", show=True)
@@ -209,7 +209,7 @@ def show_top_fms_peers(area, year, n_peers, n_fms, filter_pop, save_fig):
     peers, fms = find.get_top_n_fms_peers(
         df_data, area, year, n_peers, n_fms, filter_pop=filter_pop
     )
-    print(f"Comparison of {area} and its peers for the {n_fms} most present FMs")
+    print(f"Comparison of {code2name(area)} and its peers for its {n_fms} most present industries")
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, area, peers, fms, year,
                    save_fig=f"{save_fig}_{area}_dist_all.png", show=True)
