@@ -22,22 +22,22 @@ def get_data(area):
     area = int(area)
     if area in list(df_msa['AREA']):
         return df_msa
-    elif area in list(df_county['AREA']) :
+    elif area in list(df_county['AREA']):
         return df_county
-    
+
 
 def code2name(code):
     code = int(code)
     if code in list(df_msa['AREA']):
         return df_msa[df_msa["AREA"] == code].AREA_NAME.iloc[0]
-    elif code in list(df_county['AREA']) :
+    elif code in list(df_county['AREA']):
         return df_county[df_county["AREA"] == code].AREA_NAME.iloc[0]
 
 
 def name2code(name):
     if name.isin(df_msa_def['CBSA_TITLE']):
         return df_msa_def[df_msa_def["CBSA_TITLE"] == name].CBSA_CODE.iloc[0]
-    else :
+    else:
         return df_msa_def[df_msa_def["COUNTY"] == name].FIPS.iloc[0]
 
 
@@ -53,7 +53,7 @@ def pretty_prints(peers, fms):
     for f in fms:
         if '-' in f:
             fm = f.split('-')[0]
-            fm = fm.replace('_',' ')
+            fm = fm.replace('_', ' ')
             fm = fm.capitalize()
             metric = f.split('-')[1]
             if metric == 'PC_EMPL':
@@ -63,15 +63,18 @@ def pretty_prints(peers, fms):
             print(f"{fm} ({metric})")
         else:
             print(f)
-            
+
+
 STATE_MAPPING = us.states.mapping('fips', 'abbr')
+
 
 def add_state(x):
     fips = x.AREA
     county = x.AREA_NAME
     state = STATE_MAPPING[str(fips).zfill(5)[:2]]
     return f"{state}, {county}"
-    
+
+
 all_areas = df_msa.set_index("AREA_NAME").to_dict()["AREA"]
 df_county.sort_values('AREA', inplace=True)
 
@@ -88,10 +91,10 @@ all_fms = {
 }
 
 
-
 # all_fms = {" ".join(c.split("_")).capitalize():c for k in param.FM_DICT for c in param.FM_DICT[k]}
 
 all_outcomes = {c: c for c in list(df_msa.columns)[3:] if ("-" not in c)}
+# print([x.replace('_', ' ').capitalize() for x in list(all_outcomes.keys())])
 # all_outcomes["None"] = None
 
 style = {"description_width": "initial"}
@@ -141,10 +144,10 @@ input_population = widgets.Checkbox(
 def show_peers(df_county_dist, df_msa_def, area, n_peers, year):
     if area in list(df_msa['AREA']):
         df_data = df_msa
-        geo_level='msa'
-    elif area in list(df_county['AREA']) :
+        geo_level = 'msa'
+    elif area in list(df_county['AREA']):
         df_data = df_county
-        geo_level='county'
+        geo_level = 'county'
     peers, fms = find.get_geographic_peers(
         df_data, df_county_dist, df_msa_def, area, n_peers, year, geo_level=geo_level
     )
@@ -177,7 +180,7 @@ def show_fms_peers(
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, area, peers, fms, year)
     for i in fms:
-        vis.duo_fm_viz(df_data, area, [area] + peers, i, year, save_fig=False, show=True)
+        vis.duo_fm_viz(df_data, area, [area] + peers, i, year, save_fig=None, show=True)
     df_peers = pd.DataFrame({"Peer Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer Code"].apply(code2name)
     return df_peers
@@ -190,9 +193,11 @@ def show_disting_peers(area, year, n_peers, n_feat, filter_pop, save_fig):
     )
     print(f"Comparison of {area} and its peers for the {n_feat} most distinguishing FMs")
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, area, peers, fms,year, save_fig=f"{save_fig}_{area}_all_top.png", show=True)
+    vis.bar_all_fm(df_data, area, peers, fms, year,
+                   save_fig=f"{save_fig}_{area}_all_top.png", show=True)
     for i in fms:
-        vis.duo_fm_viz(df_data, area, [area] + peers, i, year,save_fig=f"{save_fig}_{area}_top_{i}.png", show=True)
+        vis.duo_fm_viz(df_data, area, [area] + peers, i, year,
+                       save_fig=f"{save_fig}_{area}_top_{i}.png", show=True)
     df_peers = pd.DataFrame({"Peer Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer Code"].apply(code2name)
     return df_peers
@@ -205,9 +210,11 @@ def show_top_fms_peers(area, year, n_peers, n_fms, filter_pop, save_fig):
     )
     print(f"Comparison of {area} and its peers for the {n_fms} most present FMs")
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, area, peers, fms,year,save_fig=f"{save_fig}_{area}_dist_all.png", show=True)
+    vis.bar_all_fm(df_data, area, peers, fms, year,
+                   save_fig=f"{save_fig}_{area}_dist_all.png", show=True)
     for i in fms:
-        vis.duo_fm_viz(df_data, area, [area] + peers, i,year, save_fig=f"{save_fig}_{area}_dist_{i}.png", show=True)
+        vis.duo_fm_viz(df_data, area, [area] + peers, i, year,
+                       save_fig=f"{save_fig}_{area}_dist_{i}.png", show=True)
     df_peers = pd.DataFrame({"Peer Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer Code"].apply(code2name)
     return df_peers
@@ -220,9 +227,9 @@ def show_coverage_peers(area, year, n_peers, coverage,  filter_pop):
         df_data, area, year, n_peers, coverage, filter_pop=filter_pop
     )
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, area, peers, fms,year)
+    vis.bar_all_fm(df_data, area, peers, fms, year)
     for i in fms:
-        vis.duo_fm_viz(df_data, area, [area] + peers, i, year, save_fig=False, show=True)
+        vis.duo_fm_viz(df_data, area, [area] + peers, i, year, save_fig=None, show=True)
     df_peers = pd.DataFrame({"Peer Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer Code"].apply(code2name)
     return df_peers
