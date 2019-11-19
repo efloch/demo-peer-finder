@@ -62,7 +62,7 @@ def pretty_prints(peers, fms):
                 metric = 'Location quotient'
             print(f"{fm} ({metric})")
         else:
-            print(f)
+            print(f.replace('_',' ').capitalize())
 
 
 STATE_MAPPING = us.states.mapping('fips', 'abbr')
@@ -175,10 +175,11 @@ def show_fms_peers(
         fms = []
     else:
         fms = list(fms)
+        only_fms = fms
     df_data = get_data(area)
     peers, fms = find.get_peers_from_input(df_data, area, year, n_peers, fms, outcomes)
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, area, peers, fms, year)
+    vis.bar_all_fm(df_data, area, peers,[x + "-PC_EMPL" for x in only_fms], year, show=True)
     for i in fms:
         vis.duo_fm_viz(df_data, area, [area] + peers, i, year, save_fig=None, show=True)
     df_peers = pd.DataFrame({"Peer Code": [str(x) for x in peers]})
