@@ -6,3 +6,4 @@ geopandas
 geoviz
 locuspeerexplorer
 matplotlib
+rtree
