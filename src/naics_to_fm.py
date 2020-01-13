@@ -1,18 +1,19 @@
-import os, sys
+import src.load_data as ld
+from tqdm import tqdm
+import pandas as pd
+import numpy as np
+from collections import defaultdict
+import requests
+import json
+import os
+import sys
 
 MODULE_PATH = os.path.dirname(os.path.realpath(__file__))
 DATA_PATH = os.path.join(MODULE_PATH, os.pardir, "data")
 
-import json
-import requests
-from collections import defaultdict
 
 # import clean_geo
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
 
-import src.load_data as ld
 
 DB_URL = "http://locus-db.herokuapp.com/api/"
 NAICS_DICT = {
@@ -109,7 +110,8 @@ def naics_boolean_all(list_of_years=[2002, 2007, 2012]):
 
     df_unique = combined_naics_bool.drop_duplicates(keep="first")
 
-    duplicate_naics = df_unique[df_unique["naics"].duplicated()]["naics"].to_list()
+    duplicate_naics = df_unique[df_unique["naics"].duplicated(
+    )]["naics"].to_list()
     df_unique = df_unique.drop_duplicates(subset=["naics"], keep="last")
 
     if duplicate_naics:
@@ -124,7 +126,7 @@ def naics_boolean_all(list_of_years=[2002, 2007, 2012]):
 
 def naics_data_to_fm(
     df_or_file,
-    naics_bool_df=None,
+    fm_to_naics_path,
     geo_var=None,
     variables=["ESTAB", "EMPL", "PAYANN"],
     outfile=None,
@@ -132,8 +134,8 @@ def naics_data_to_fm(
     """
     Takes YEAR x MSA x NAICS and sums across those to return a YEAR x MSA x FM table
     :param (DataFrame) df_or_file: the YEAR x MSA x NAICS dataframe or path to the file
-    :param (DataFrame) naics_bool_df: if not provided, tries to read from data/intermediary or pull
-                                      from LocusDB using naics_boolean_all()
+    :param (DataFrame) fm_to_naics_path: the  NAICS x FM table, path to the file
+
     :param (str) geo_var: the column name of the geographic variable ('MSA' and 'FIPS' are checked
                                       by default
     :param (list) variables: list of variables to sum (employment, # establishments, etc.)
@@ -159,6 +161,7 @@ def naics_data_to_fm(
 
     full_df = df.copy()
     full_df.columns = [col.upper() for col in df.columns]
+    full_df['NAICS'] = full_df['NAICS'].astype(int)
     # check for geographic name in DataFrame columns
     if geo_var:
         pass
@@ -171,36 +174,32 @@ def naics_data_to_fm(
         geo_var is not None
     ), "No geographic label found in columns of given DataFrame."
 
-    if not isinstance(naics_bool_df, pd.DataFrame):
-        naics_bool_df = naics_boolean_all()
-    fm_dict = naics_bool_df.apply(lambda fm: list(fm[fm == 1].index)).to_dict()
-    print("FM-NAICS table loaded/generated")
-
-    processed_data = []
-    for fm in tqdm(fm_dict):
-        fm_subdf = (
-            full_df[full_df["NAICS"].isin(fm_dict[fm])]
-            .groupby(["YEAR", geo_var])[variables]
-            .sum()
-        )
-        fm_subdf.insert(0, "FM", value=fm)
-        processed_data.append(fm_subdf)
+    full_path_to_xw = os.path.join(
+        os.path.join(DATA_PATH, 'external'), fm_to_naics_path)
+    fm_to_naics = pd.read_csv(full_path_to_xw, dtype={'NAICS': int})
+    print(full_df.info())
+    full_df = full_df.merge(fm_to_naics[['FM', 'NAICS']], on='NAICS')
+    full_df = full_df.groupby(by=['FIPS', 'YEAR', 'NAICS_LEVEL', 'FM'], as_index=False)[
+        'EMPL', 'PAYANN', 'ESTAB'].sum()
+    print(full_df.head())
     print("Data processed into FM")
-
-    df_out = pd.concat(processed_data).reset_index()
 
     if outfile:
         print("Saving file...")
-        df_out.to_csv(os.path.join(DATA_PATH, "processed", outfile), index=False)
+        full_df.to_csv(os.path.join(
+            DATA_PATH, "processed", outfile), index=False)
     print("\n---DONE---")
-    return df_out
+    return full_df
 
 
 if __name__ == "__main__":
     county_naics_data = ld.load_by_naics(naics_level=6, geo_level="county")
+    county_naics_data = county_naics_data[county_naics_data['YEAR'] == 2016]
     print(county_naics_data.head())
     # county_naics_data = clean_geo.relabel_legacy_msa(
     #     msa_naics_data, auto_sum=["YEAR", "NAICS"]
     # )
     outfile = "fm_by_county_all_years.csv"
-    msa_fm_data = naics_data_to_fm(county_naics_data, outfile=outfile)
+    msa_fm_data = naics_data_to_fm(
+        county_naics_data, 'naics_to_fm_xw.csv', outfile=outfile)
+    print(sorted(list(msa_fm_data[msa_fm_data['YEAR'] == 2016].FIPS.unique())))

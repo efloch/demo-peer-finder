@@ -12,7 +12,6 @@ import itertools
 
 # import geoviz.choropleth as choro
 
-df_msa = pd.read_csv("data/processed/metrics_outcomes.csv")
 df_county = pd.read_csv("data/processed/county_metrics_outcomes.csv")
 df_msa_def = pd.read_csv("data/external/omb_msa_1990_2018.csv")
 df_county_dist = pd.read_csv("data/external/sf12010countydistance500miles.csv")
@@ -62,7 +61,7 @@ def pretty_prints(peers, fms):
                 metric = 'Location quotient'
             print(f"{fm} ({metric})")
         else:
-            print(f.replace('_',' ').capitalize())
+            print(f.replace('_', ' ').capitalize())
 
 
 STATE_MAPPING = us.states.mapping('fips', 'abbr')
@@ -71,13 +70,13 @@ STATE_MAPPING = us.states.mapping('fips', 'abbr')
 def add_state(x):
     fips = x.AREA
     county = x.AREA_NAME
-    state = STATE_MAPPING[str(fips).zfill(5)[:2]]
+    state = (str(int(fips)).zfill(5))[:2].zfill(2)
+    state = STATE_MAPPING[state]
     return f"{state}, {county}"
 
 
 all_areas = df_msa.set_index("AREA_NAME").to_dict()["AREA"]
 df_county.sort_values('AREA', inplace=True)
-
 df_county['AREA_NAME'] = df_county.apply(add_state, axis=1)
 all_counties = df_county.set_index("AREA_NAME").to_dict()["AREA"]
 # all_counties = {get_state(k[0], k[1]):k[1] for k in all_counties.items()}
@@ -177,11 +176,14 @@ def show_fms_peers(
         fms = list(fms)
         only_fms = fms
     df_data = get_data(area)
-    peers, fms = find.get_peers_from_input(df_data, area, year, n_peers, fms, outcomes)
+    peers, fms = find.get_peers_from_input(
+        df_data, area, year, n_peers, fms, outcomes)
     pretty_prints(peers, fms)
-    vis.bar_all_fm(df_data, area, peers,[x + "-PC_EMPL" for x in only_fms], year, show=True)
+    vis.bar_all_fm(df_data, area, peers, [
+                   x + "-PC_EMPL" for x in only_fms], year, show=True)
     for i in fms:
-        vis.duo_fm_viz(df_data, area, [area] + peers, i, year, save_fig=None, show=True)
+        vis.duo_fm_viz(df_data, area, [area]
+                       + peers, i, year, save_fig=None, show=True)
     df_peers = pd.DataFrame({"Peer Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer Code"].apply(code2name)
     return df_peers
@@ -192,7 +194,8 @@ def show_disting_peers(area, year, n_peers, n_feat, filter_pop, save_fig):
     peers, fms = find.get_distinguishing_features_peers(
         df_data, area, year, n_peers, n_feat, filter_pop=filter_pop
     )
-    print(f"Comparison of {code2name(area)} and its peers for its {n_feat} most distinguishing traits")
+    print(
+        f"Comparison of {code2name(area)} and its peers for its {n_feat} most distinguishing traits")
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, area, peers, fms, year,
                    save_fig=f"{save_fig}_{area}_all_top.png", show=True)
@@ -230,7 +233,8 @@ def show_coverage_peers(area, year, n_peers, coverage,  filter_pop):
     pretty_prints(peers, fms)
     vis.bar_all_fm(df_data, area, peers, fms, year)
     for i in fms:
-        vis.duo_fm_viz(df_data, area, [area] + peers, i, year, save_fig=None, show=True)
+        vis.duo_fm_viz(df_data, area, [area]
+                       + peers, i, year, save_fig=None, show=True)
     df_peers = pd.DataFrame({"Peer Code": [str(x) for x in peers]})
     df_peers["Peer Name"] = df_peers["Peer Code"].apply(code2name)
     return df_peers

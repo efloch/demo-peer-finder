@@ -1,7 +1,8 @@
 import pandas as pd
 import os
 
-import os, sys
+import os
+import sys
 import requests
 import pandas as pd
 from src.load_data import *
@@ -62,6 +63,8 @@ DTYPE_DICT = {
 }
 
 ## HELPER FUNCTIONS ##
+
+
 def _compute_totals(df, df_naics, geo="FIPS", variables=["EMPL", "ESTAB"]):
     """
     Given a Dataframe by FMs, and a DataFrame
@@ -104,7 +107,7 @@ def _compute_local_totals(df, df_naics, local, geo="MSA", variables=["EMPL", "ES
     if isinstance(local, list):
         if not local[0].isdigit():
             local = naics_to_fm.query_fm_naics(local)
-    ## create subset dataframe with just the local function rows
+    # create subset dataframe with just the local function rows
     df_naics_local = df_naics[df_naics["NAICS"].isin(local)]
 
     for var in variables:
@@ -159,8 +162,9 @@ def _test_normality(fm_df, metric, summary=True):
         - whether there is high variance in the max of each FM
         - what % of the FMs had a p value < 0.05 for a normality test
     """
-    test = lambda series: stats.kstest(series, cdf="norm")[1]
-    df = fm_df.groupby("FM")[metric].agg(["min", "mean", "median", "max", test])
+    def test(series): return stats.kstest(series, cdf="norm")[1]
+    df = fm_df.groupby("FM")[metric].agg(
+        ["min", "mean", "median", "max", test])
     if summary:
         med_max = (df["mean"] - df["median"]).mean()
         min_max = (
@@ -327,7 +331,8 @@ def calc_eer(df, geo="FIPS"):
     """
     try:
         df["EER"] = df["EMPL"] / df["ESTAB"]
-        df["REL_EER"] = df["EER"] / (df["TOTAL_EMPL_FM"] / df["TOTAL_ESTAB_FM"])
+        df["REL_EER"] = df["EER"] / \
+            (df["TOTAL_EMPL_FM"] / df["TOTAL_ESTAB_FM"])
     except KeyError as err:
         if str(err) == "'EMPL'":
             print(
@@ -437,7 +442,8 @@ def calc_bm_combo(df, geo="FIPS", weighting={"EMPL": 0.5, "ESTAB": 0.5}):
     Calculate binary metric based on location quotient.
     """
     try:
-        df["BM_EMPL_ESTAB"] = df["LQ_EMPL_ESTAB"].apply(lambda lq: 1 if lq > 1 else 0)
+        df["BM_EMPL_ESTAB"] = df["LQ_EMPL_ESTAB"].apply(
+            lambda lq: 1 if lq > 1 else 0)
     except KeyError as err:
         if str(err) == f"'LQ_EMPL_ESTAB'":
             df = calc_lq_combo(df, geo, weighting)
@@ -471,7 +477,7 @@ def standardize_log(fm_df, metric="LQ", variables=["EMPL", "ESTAB"], ensure=True
     in order to address normality issues. See Tian (2013) Measuring Agglomeration...
     If ensure=True, adds 0.0001 to series so log does not result in -inf values.
     """
-    zscore = lambda series: (series - series.mean()) / series.std()
+    def zscore(series): return (series - series.mean()) / series.std()
 
     for var in variables:
         if ensure:
@@ -506,9 +512,11 @@ def fill_zero_pivot(gbdf, geo="FIPS"):
     """
     Adds zeros to metrics that were previously filtered out
     """
-    assert len(gbdf["YEAR"].unique()) == 1, "DataFrame contains more than one year"
+    assert len(gbdf["YEAR"].unique()
+               ) == 1, "DataFrame contains more than one year"
 
-    all_combo = [(msa, fm) for msa in gbdf[geo].unique() for fm in gbdf["FM"].unique()]
+    all_combo = [(msa, fm) for msa in gbdf[geo].unique()
+                 for fm in gbdf["FM"].unique()]
     missing = list(set(all_combo) - set(list(zip(gbdf[geo], gbdf["FM"]))))
 
     columns = [
@@ -538,7 +546,8 @@ def get_ranks(
     """
 
     for metric in rank_metrics:
-        fm_df[metric + "_RANK"] = fm_df.groupby("FM")[metric].rank(ascending=ascending)
+        fm_df[metric
+              + "_RANK"] = fm_df.groupby("FM")[metric].rank(ascending=ascending)
     return fm_df
 
 
@@ -727,38 +736,110 @@ def func_dist_wrapper(
     return final_df
 
 
-if __name__ == "__main__":
-    # years = [2015]
-    # # Edit to appropriate path to file containing FM x MSA x YEAR data file
-    # filename = "fm_by_county_all_years.csv"
-    # path_to_file = os.path.join(DATA_PATH, "processed", filename)
+def process_save_all():
+    filename = "fm_by_county_all_years.csv"
+    path_to_file = os.path.join(DATA_PATH, "processed", filename)
     #
     # # Edit to appropriate outfile name and path placement
     outfile = "fm_by_county_metrics.csv"
     path_to_outfile = os.path.join(DATA_PATH, "processed", outfile)
     #
-    # df_metrics = func_dist_wrapper(
-    #     path_to_file, outfile_path=path_to_outfile, years=[2015, 2016]
-    # )
+    df_metrics = func_dist_wrapper(
+        path_to_file, outfile_path=path_to_outfile, years=[2016])
 
     yearly_df = []
     fm_df = pd.read_csv(path_to_outfile)
-    vars_of_interest = ["PC_EMPL", "PRES_ESTAB", "LQ_EMPL_ESTAB_RANK"]
+    vars_of_interest = ["PC_EMPL", "PRES_ESTAB", "LQ_EMPL_RANK", "LQ_EMPL"]
     for year in [2016]:
         sub_dfs = []
-        fm_df = fm_df.query("YEAR==@year")
+
+        df = fm_df[fm_df['YEAR'] == 2016]
+
         for vari in vars_of_interest:
-            temp_df = fm_df[["FIPS", "YEAR", "FM", vari]]
-            temp_df = temp_df.pivot(index="FIPS", columns="FM", values=vari)
+            temp_df = df[["FIPS", "YEAR", "FM", vari]]
+            temp_df = temp_df.pivot(
+                index="FIPS", columns="FM", values=vari)
             temp_df = temp_df.add_suffix("-" + vari)
-            print(temp_df.head())
+
             sub_dfs.append(temp_df)
         yearly = pd.concat(sub_dfs, axis=1)
         yearly.reset_index()
         yearly_df.append(yearly)
     df_county = pd.concat(yearly_df)
-    df_county.reset_index(inplace=True)
-    df_county.to_csv(os.path.join(DATA_PATH, "processed", "metrics_county.csv"))
-    acs_county = pd.read_csv("data/SummerDataPackage/outcome/acs_cleaned_county.csv")
-    metrics_outcomes = df_county.merge(df_county, on="FIPS")
-    metrics_outcomes.to_csv("data/processed/county_metrics_outcomes.csv")
+    df_county.to_csv(os.path.join(
+        DATA_PATH, "processed", "metrics_county.csv"))
+    acs_county = pd.read_csv(
+        "data/SummerDataPackage/outcome/acs_cleaned_county.csv")
+    acs_county = acs_county[acs_county['YEAR'] == 2016]
+    acs_county.set_index('FIPS', inplace=True)
+    metrics_outcomes = df_county.merge(acs_county, left_index=True,
+                                       right_index=True)
+
+    df_titles = pd.read_csv('data/external/county_names.csv')
+    df_titles = df_titles[['AREA', 'AREA_NAME']].drop_duplicates()
+    df_titles.set_index('AREA', inplace=True)
+    metrics_outcomes = metrics_outcomes.merge(df_titles, left_index=True,
+                                              right_index=True).reset_index()
+    metrics_outcomes.rename(columns={'index': 'AREA'}, inplace=True)
+    metrics_outcomes = metrics_outcomes[metrics_outcomes['AREA_NAME'].str.contains("County")]
+
+    metrics_outcomes.to_csv(
+        "data/processed/county_metrics_outcomes.csv", index=False)
+
+
+def process_save_by_metric(infile, outfile, year):
+
+    path_to_file = os.path.join(DATA_PATH, "processed", infile)
+
+    # # Edit to appropriate outfile name and path placement
+    path_to_outfile = os.path.join(DATA_PATH, "processed", outfile)
+    #
+    df_metrics = func_dist_wrapper(
+        path_to_file, outfile_path=path_to_outfile, years=[2016])
+
+    yearly_df = []
+    fm_df = pd.read_csv(path_to_outfile)
+    vars_of_interest = ["PC_EMPL", "PRES_ESTAB", "LQ_EMPL_RANK", "LQ_EMPL"]
+    vars_df = {v: 0 for v in vars_of_interest}
+    for var in vars_of_interest:
+        df = fm_df[fm_df['YEAR'] == year]
+        temp_df = df[["FIPS", "YEAR", "FM", var]]
+        temp_df = temp_df.pivot(index="FIPS", columns="FM", values=var)
+        temp_df = temp_df.add_suffix("-" + var)
+        temp_df.to_csv(os.path.join(
+            DATA_PATH, "processed", f"metrics_{var.lower()}_county.csv"))
+        vars_df[var] = temp_df
+
+    acs_county = pd.read_csv(
+        "data/SummerDataPackage/outcome/acs_cleaned_county.csv")
+    acs_county = acs_county[acs_county['YEAR'] == year]
+    acs_county.set_index('FIPS', inplace=True)
+
+    df_titles = pd.read_csv('data/external/county_names.csv')
+    df_titles = df_titles[['AREA', 'AREA_NAME']].drop_duplicates()
+    df_titles.set_index('AREA', inplace=True)
+
+    for var in vars_of_interest:
+
+        if var == 'PC_EMPL':
+            metrics_outcomes = vars_df[var].merge(acs_county, left_index=True,
+                                                  right_index=True)
+            outfile = f"data/processed/county_{var.lower()}_outcomes.csv"
+        else:
+            metrics_outcomes = vars_df[var]
+            outfile = f"data/processed/county_{var.lower()}.csv"
+
+        metrics_outcomes['YEAR'] = year
+        metrics_outcomes = metrics_outcomes.merge(df_titles, left_index=True,
+                                                  right_index=True).reset_index()
+        metrics_outcomes.rename(columns={'index': 'AREA'}, inplace=True)
+
+        metrics_outcomes = metrics_outcomes[metrics_outcomes['AREA_NAME'].str.contains("County")]
+        metrics_outcomes.to_csv(outfile, index=False)
+
+
+if __name__ == "__main__":
+    # process_save_by_metric("fm_by_county_all_years.csv",
+    #                        "fm_by_county_metrics.csv", 2016)
+
+    process_save_all()

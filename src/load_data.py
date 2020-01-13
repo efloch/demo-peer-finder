@@ -46,10 +46,8 @@ def _load_data_from_paths(paths, geo_level, column_set, notebook):
     #             # df["AREA"] = df["FIPS"]
     #             # df.drop(["FIPS"], 1, inplace=True)
     #             res.append(df)
-    for path in paths:
-        print(path)
+    for path in tqdm(paths):
         try:
-            print(path)
             df = pd.read_csv(path.replace("cbsa", "msa"), dtype=DTYPE_DICT)
             if column_set == "strict":
                 df = df[strict_column_set[geo_level]]
@@ -124,7 +122,8 @@ def load_by_naics(
     # naics level specified, no naics specified
     if naics_level:
         if naics:
-            raise ValueError("if naics_level is specified, naics must be empty list")
+            raise ValueError(
+                "if naics_level is specified, naics must be empty list")
         # each ? will match with any 1 digit, thus multiply ? by naics_level
         wild_card = "?" * naics_level
         glob_path = os.path.join(
