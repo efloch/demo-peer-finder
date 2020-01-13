@@ -3,7 +3,7 @@ ipywidgets
 nbinteract
 pandas
 geopandas
-rtree
 geoviz
 locuspeerexplorer
-matplotlib==2.2.3
+matplotlib
+rtree
