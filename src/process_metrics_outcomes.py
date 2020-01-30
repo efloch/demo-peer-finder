@@ -781,13 +781,16 @@ def process_save_all():
     metrics_outcomes = metrics_outcomes.merge(df_titles, left_index=True,
                                               right_index=True).reset_index()
     metrics_outcomes.rename(columns={'index': 'AREA'}, inplace=True)
-    metrics_outcomes = metrics_outcomes[metrics_outcomes['AREA_NAME'].str.contains("County")]
+    metrics_outcomes = metrics_outcomes[metrics_outcomes['AREA_NAME'].str.contains(
+        "County")]
 
     metrics_outcomes.to_csv(
         "data/processed/county_metrics_outcomes.csv", index=False)
 
 
-def process_save_by_metric(infile, outfile, year):
+def process_save_by_metric(infile, outfile, year,
+                           vars_of_interest=["PC_EMPL", "PRES_ESTAB",
+                                             "LQ_EMPL_RANK", "LQ_EMPL"]):
 
     path_to_file = os.path.join(DATA_PATH, "processed", infile)
 
@@ -799,7 +802,6 @@ def process_save_by_metric(infile, outfile, year):
 
     yearly_df = []
     fm_df = pd.read_csv(path_to_outfile)
-    vars_of_interest = ["PC_EMPL", "PRES_ESTAB", "LQ_EMPL_RANK", "LQ_EMPL"]
     vars_df = {v: 0 for v in vars_of_interest}
     for var in vars_of_interest:
         df = fm_df[fm_df['YEAR'] == year]
@@ -834,12 +836,13 @@ def process_save_by_metric(infile, outfile, year):
                                                   right_index=True).reset_index()
         metrics_outcomes.rename(columns={'index': 'AREA'}, inplace=True)
 
-        metrics_outcomes = metrics_outcomes[metrics_outcomes['AREA_NAME'].str.contains("County")]
+        metrics_outcomes = metrics_outcomes[metrics_outcomes['AREA_NAME'].str.contains(
+            "County")]
         metrics_outcomes.to_csv(outfile, index=False)
 
 
 if __name__ == "__main__":
-    # process_save_by_metric("fm_by_county_all_years.csv",
-    #                        "fm_by_county_metrics.csv", 2016)
+    process_save_by_metric("fm_by_county_all_years.csv",
+                           "fm_by_county_metrics.csv", 2016, ['PC_EMPL'])
 
-    process_save_all()
+    # process_save_all()

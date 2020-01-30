@@ -6,6 +6,7 @@ import locuspeerexplorer.peer_explorer as exp
 import locuspeerexplorer.peer_visualizer as vis
 import locuspeerexplorer.params as param
 import pandas as pd
+import numpy as np
 import us
 import os
 import itertools
@@ -159,8 +160,15 @@ def show_fms_peers(
     peers, fms = find.get_peers_from_input(
         df_data, area, year, n_peers, fms, outcomes)
     pretty_prints(peers, fms)
+
+    max_len = np.max([len(f) for f in fms])
+    if max_len >= 40:
+        show_labels = False
+    else:
+        show_labels = True
     vis.bar_all_fm(df_data, area, peers, [
-                   x + "-PC_EMPL" for x in only_fms], year, show=True)
+                   x + "-PC_EMPL" for x in only_fms], year,
+                   show=True, show_labels=show_labels)
     for i in fms:
         vis.duo_fm_viz(df_data, area, [area]
                        + peers, i, year, save_fig=None, show=True)
@@ -170,15 +178,20 @@ def show_fms_peers(
 
 
 def show_disting_peers(area, year, n_peers, n_feat, filter_pop, save_fig):
-    
+
     peers, fms = find.get_distinguishing_features_peers(
         df_data, area, year, n_peers, n_feat, filter_pop=filter_pop
     )
     print(
         f"Comparison of {code2name(area)} and its peers for its {n_feat} most distinguishing traits")
     pretty_prints(peers, fms)
+    max_len = np.max([len(f) for f in fms])
+    if max_len >= 40:
+        show_labels = False
+    else:
+        show_labels = True
     vis.bar_all_fm(df_data, area, peers, fms, year,
-                   save_fig=f"{save_fig}_{area}_all_top.png", show=True)
+                   save_fig=f"{save_fig}_{area}_all_top.png", show=True, show_labels=show_labels)
     for i in fms:
         vis.duo_fm_viz(df_data, area, [area] + peers, i, year,
                        save_fig=f"{save_fig}_{area}_top_{i}.png", show=True)
@@ -194,8 +207,13 @@ def show_top_fms_peers(area, year, n_peers, n_fms, filter_pop, save_fig):
     )
     print(f"Comparison of {code2name(area)} and its peers for its {n_fms} most present industries")
     pretty_prints(peers, fms)
+    max_len = np.max([len(f) for f in fms])
+    if max_len >= 40:
+        show_labels = False
+    else:
+        show_labels = True
     vis.bar_all_fm(df_data, area, peers, fms, year,
-                   save_fig=f"{save_fig}_{area}_dist_all.png", show=True)
+                   save_fig=f"{save_fig}_{area}_dist_all.png", show=True, show_labels=show_labels)
     for i in fms:
         vis.duo_fm_viz(df_data, area, [area] + peers, i, year,
                        save_fig=f"{save_fig}_{area}_dist_{i}.png", show=True)
